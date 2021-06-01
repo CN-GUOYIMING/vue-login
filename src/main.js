@@ -8,17 +8,16 @@ import axios from "axios";
 // Modules
 import App from "./App";
 import router from "./router";
-import store from "@/store";
 
 // 面向開發者的提示 默認爲 false
 Vue.config.productionTip = true;
+
+Vue.prototype.$axios = axios;
 
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
   router,
-  store,
-  axios,
   components: { App },
   template: "<App/>"
 });

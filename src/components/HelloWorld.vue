@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>メール：{{ email }}</h1>
+    <h1>メール：{{ message }}</h1>
   </div>
 </template>
 
@@ -9,7 +9,7 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      email: this.$route.params.email
+      message: "ログインに成功しました。"
     };
   }
 };

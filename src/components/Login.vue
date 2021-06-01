@@ -1,8 +1,8 @@
 <template>
   <div id="Login">
-    <section v-show="errorMessage" class="message-container">
+    <section v-show="error" class="message-container">
       <h3 class="message-body">
-        {{ errorMessage }}
+        {{ error }}
       </h3>
     </section>
 
@@ -18,6 +18,7 @@
         type="email"
         placeholder="Eメール"
         v-model="email"
+        @blur="validateMail()"
       />
 
       <input
@@ -33,34 +34,44 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-
 export default {
   name: "Login",
 
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
+      error: ""
     };
   },
 
-  computed: {
-    ...mapState("message", ["message"]),
-    errorMessage() {
-      return this.message.error;
-    }
-  },
-
   methods: {
-    ...mapActions("auth", ["create"]),
     login() {
-      this.create({
-        user: {
-          email: this.email,
-          password: this.password
-        }
+      /**
+       * 正しいログイン情報：
+       * email: vue@test.com
+       * password: 123abc
+       */
+      this.$axios.get("/static/api/auth.json").then(result => {
+        const isRightAccount = this.validateAccount(result.data);
+        isRightAccount
+          ? this.$router.push("/helloworld")
+          : (this.error = "入力されたアカウント情報に誤りがあります。");
       });
+    },
+
+    validateAccount({ email, password }) {
+      return this.email === email && this.password === password;
+    },
+
+    validateMail() {
+      const isRightMail = /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/.test(
+        this.email
+      );
+
+      this.error = isRightMail
+        ? ""
+        : "正しいメールアドレスを入力してください。";
     }
   }
 };
