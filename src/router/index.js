@@ -11,13 +11,13 @@ export default new Router({
   routes: [
     {
       path: "/",
-      name: "Login", // 名字不依頼其他東西
-      component: Login
-    },
-    {
-      path: "/helloworld",
       name: "HelloWorld",
       component: HelloWorld
+    },
+    {
+      path: "/login",
+      name: "Login", // 名字不依頼其他東西
+      component: Login
     }
   ]
 });

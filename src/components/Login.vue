@@ -47,21 +47,18 @@ export default {
 
   methods: {
     login() {
-      /**
-       * 正しいログイン情報：
-       * email: vue@test.com
-       * password: 123abc
-       */
-      this.$axios.get("/static/api/auth.json").then(result => {
-        const isRightAccount = this.validateAccount(result.data);
-        isRightAccount
-          ? this.$router.push("/helloworld")
-          : (this.error = "入力されたアカウント情報に誤りがあります。");
-      });
+      this.validateAccount();
+
+      if (!this.error)
+        this.$axios.get("/static/api/token.json").then(response => {
+          sessionStorage.setItem("token", response.data.token);
+          this.$router.push("/");
+        });
     },
 
-    validateAccount({ email, password }) {
-      return this.email === email && this.password === password;
+    validateAccount() {
+      this.error =
+        this.email && this.password ? "" : "アカウント情報を入力してください。";
     },
 
     validateMail() {

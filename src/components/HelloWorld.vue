@@ -1,6 +1,8 @@
 <template>
   <div class="hello">
-    <h1>メール：{{ message }}</h1>
+    <h1>My Token Is：{{ token }}</h1>
+
+    <button @click="clearToken()">Clear Token</button>
   </div>
 </template>
 
@@ -9,8 +11,21 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      message: "ログインに成功しました。"
+      token: sessionStorage.getItem("token")
     };
+  },
+  methods: {
+    checkToken() {
+      if (!this.token) this.$router.push("/login");
+    },
+
+    clearToken() {
+      sessionStorage.setItem("token", "");
+      location.reload();
+    }
+  },
+  created() {
+    this.checkToken();
   }
 };
 </script>
