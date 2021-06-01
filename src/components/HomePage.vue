@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div id="HomePage">
     <h1>My Token Is：{{ token }}</h1>
 
     <button @click="clearToken()">Clear Token</button>
@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: "HelloWorld",
+  name: "HomePage",
   data() {
     return {
       token: sessionStorage.getItem("token")
