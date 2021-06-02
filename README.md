@@ -1,4 +1,4 @@
-# Vue Login Page
+# Vue Login Page (Authenticate Server)
 
 > A Vue.js project
 
