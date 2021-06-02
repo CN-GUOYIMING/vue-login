@@ -36,7 +36,6 @@
 <script>
 export default {
   name: "Login",
-
   data() {
     return {
       email: "",
@@ -44,23 +43,37 @@ export default {
       error: ""
     };
   },
-
   methods: {
     login() {
-      this.validateAccount();
-
       if (!this.error)
-        this.$axios.get("/static/api/token.json").then(response => {
-          sessionStorage.setItem("token", response.data.token);
-          this.$router.push("/");
-        });
+        if (this.email === "vue@test.com" && this.password === "123") {
+          this.$axios
+            .get("/static/api/success.json")
+            .then(response => {
+              /**
+               * 親画面で
+               * window.addEventListener("message", callback);
+               * で受け取る。
+               */
+              window.parent.postMessage(
+                { token: response.data.token },
+                "http://localhost:8081/" // ホームページを持つサーバー
+              );
+            })
+            .catch(error => (this.error = error));
+        } else {
+          this.$axios
+            .get("/static/api/fasle.json")
+            .then(response => {
+              sessionStorage.setItem("token", response.data.token);
+              window.close();
+            })
+            .catch(error => {
+              this.error = "Token の取得に失敗しました。";
+              console.log(error);
+            });
+        }
     },
-
-    validateAccount() {
-      this.error =
-        this.email && this.password ? "" : "アカウント情報を入力してください。";
-    },
-
     validateMail() {
       const isRightMail = /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/.test(
         this.email
@@ -74,7 +87,7 @@ export default {
 };
 </script>
 
-<!-- 有 scoped 屬性表示樣式衹在此組件内生效 -->
+<!-- scoped 属性は該当スタイルがこの対象内のみ有効であると意味する -->
 <style scoped>
 #Login {
   align-items: center;
