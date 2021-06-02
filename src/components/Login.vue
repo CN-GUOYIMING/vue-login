@@ -65,8 +65,10 @@ export default {
           this.$axios
             .get("/static/api/fasle.json")
             .then(response => {
-              sessionStorage.setItem("token", response.data.token);
-              window.close();
+              window.parent.postMessage(
+                { token: response.data.token },
+                "http://localhost:8081/" // ホームページを持つサーバー
+              );
             })
             .catch(error => {
               this.error = "Token の取得に失敗しました。";
