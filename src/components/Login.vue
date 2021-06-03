@@ -40,42 +40,21 @@ export default {
     return {
       email: "",
       password: "",
-      error: ""
+      error: "",
+      securityCode: "1234"
     };
   },
   methods: {
     login() {
-      if (!this.error)
-        if (this.email === "vue@test.com" && this.password === "123") {
-          this.$axios
-            .get("/static/api/success.json")
-            .then(response => {
-              /**
-               * 親画面で
-               * window.addEventListener("message", callback);
-               * で受け取る。
-               */
-              window.parent.postMessage(
-                { token: response.data.token },
-                "http://localhost:8081/" // ホームページを持つサーバー
-              );
-            })
-            .catch(error => (this.error = error));
-        } else {
-          this.$axios
-            .get("/static/api/fasle.json")
-            .then(response => {
-              window.parent.postMessage(
-                { token: response.data.token },
-                "http://localhost:8081/" // ホームページを持つサーバー
-              );
-            })
-            .catch(error => {
-              this.error = "Token の取得に失敗しました。";
-              console.log(error);
-            });
-        }
+      if (this.email === "vue@test.com" && this.password === "123") {
+        window.location = `${this.getUrlParameter("redirect_uri")}?code=${
+          this.securityCode
+        }&state=${this.getUrlParameter("state")}`;
+      } else {
+        this.error = "入力内容に誤りがあります。";
+      }
     },
+
     validateMail() {
       const isRightMail = /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/.test(
         this.email
@@ -84,6 +63,39 @@ export default {
       this.error = isRightMail
         ? ""
         : "正しいメールアドレスを入力してください。";
+    },
+
+    getUrlParameter(parameterName) {
+      const parameters = window.location.search.substring(1);
+      const parametersArray = parameters.split("&");
+
+      const target = parametersArray.find(parameter => {
+        return parameter.split("=")[0] === parameterName;
+      });
+
+      return target.split("=")[1];
+    }
+  },
+
+  created() {
+    // urlのパラメータに"client_secret"があることは認証の段階を経たと意味する。
+    if (window.location.search.includes("client_secret")) {
+      if (
+        this.getUrlParameter("code") === this.securityCode &&
+        this.getUrlParameter("client_id") === "client01" &&
+        this.getUrlParameter("client_secret") === "password"
+      ) {
+        this.$axios
+          .get("/static/api/success.json")
+          .then(response => {
+            window.location = `${this.getUrlParameter("redirect_uri")}?token=${
+              response.data.token
+            }`;
+          })
+          .catch(error => (this.error = error));
+      } else {
+        this.error = "認証に失敗しました。";
+      }
     }
   }
 };
